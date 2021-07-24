@@ -33,6 +33,7 @@ public class WindowsTest {
     
 	@BeforeClass
 	public void beforeSuite() {
+		System.out.println("\n*****user working directory : "+System.getProperty("user.dir"));
 		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+"\\chromedriver.exe");
 		//Below code is disable notifications from chrome browser during the testing
 		Map<String, Object> prefs = new HashMap<String, Object>();
@@ -94,7 +95,27 @@ public class WindowsTest {
 	}
 	
 	public static void waitForPageLoading(WebDriver driver) {
-		
+		int networkCallsLengthBefore = 0;
+		int networkCallsLengthAfter = 0;
+		System.out.println("***starting waitForPageRendering()");
+		for (int i = 0; i < 45; i++) {
+			try {
+				String scriptToExecute = "var network = performance.getEntries(); return network;";
+				String networkCalls = ((JavascriptExecutor) driver).executeScript(scriptToExecute).toString();
+				networkCallsLengthBefore = networkCallsLengthAfter;
+				networkCallsLengthAfter = networkCalls.length();				
+				System.out.println(networkCallsLengthBefore+" : "+networkCallsLengthAfter);
+				if (networkCallsLengthBefore == networkCallsLengthAfter && networkCalls.contains("entryType=paint,")) break;
+				System.out.println("praveen kumar samala - my own code: waiting for the page to be rendered...");
+			}
+			catch (Exception e) {
+				System.out.println("inspect error");
+			}
+			finally {
+				sleep(1);
+			}
+		}
+		System.out.println("***ending waitForPageLoading()"+"\n");
 	}
 	
 	public static void sleep(int n) {
