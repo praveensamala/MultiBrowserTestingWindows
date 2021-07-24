@@ -39,7 +39,6 @@ public class WindowsTest {
 		prefs.put("profile.default_content_setting_values.notifications", 2);  
 		options.setExperimentalOption("prefs", prefs);
 		
-		
 		System.setProperty("webdriver.gecko.driver",  "geckodriver.exe");
 		FirefoxProfile profile = new FirefoxProfile();
 	    profile.setPreference("permissions.default.desktop-notification", 1);
@@ -49,85 +48,52 @@ public class WindowsTest {
 	@Test (enabled = true)
 	public void loginTest1() {		
 		WebDriver driver = new ChromeDriver(options);
-		facebookLoginTestChrome(driver);
+		facebookLoginTest(driver);
 		driver.close();
 	}
 	
 	@Test (enabled = true)
 	public void loginTest2() {
-	    WebDriver driver = new FirefoxDriver(capabilities);
-	    facebookLoginTestFirefox(driver);
+	    @SuppressWarnings("deprecation")
+		WebDriver driver = new FirefoxDriver(capabilities);
+	    facebookLoginTest(driver);
 		driver.close();
 	}
 	
-	public static void facebookLoginTestChrome(WebDriver driver) {
+	public static void facebookLoginTest(WebDriver driver) {
 		driver.get("https://www.facebook.com");
+		driver.manage().window().maximize();
 		
 		driver.findElement(By.id("email")).sendKeys("gamecheck280@gmail.com");
 		driver.findElement(By.id("pass")).sendKeys("system123");
 		driver.findElement(By.name("login")).click();
 		
-		WebDriverWait wait = new WebDriverWait(driver,30);
-		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type=\"submit\"]")));
+		waitForPageLoading(driver);
 		
 		List <WebElement> list = new ArrayList<WebElement>();
 		list = driver.findElements(By.tagName("span"));
 		boolean userfound = false;
 		for(WebElement e: list) {
-			if (e.getText().contains("Gamecheck") && !e.getText().contains("Not you") && !e.getText().contains("Log in as")) {
+			//System.out.println("\n****gettext : "+e.getText());
+			if (e.getText().contains("Gamecheck")) {
 				userfound = true;
 				break;
 			}
 		}
 		
-		driver.findElement(By.id("userNavigationLabel")).click();
-		
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span//form[@method='post']")));
-		WebElement ele = driver.findElement(By.xpath("//span//form[@method='post']"));
-		JavascriptExecutor executor = (JavascriptExecutor)driver;
-		executor.executeScript("arguments[0].click();", ele);
-		
-		//wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@name='websubmit']")));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@role='button' and contains(text(), 'Create New Account')]")));
-		
-		AssertJUnit.assertTrue(userfound);
-	}
-	
-	public static void facebookLoginTestFirefox(WebDriver driver) {
-		driver.get("https://www.facebook.com");
-		
-		driver.findElement(By.id("email")).sendKeys("gamecheck280@gmail.com");
-		driver.findElement(By.id("pass")).sendKeys("system123");
-		driver.findElement(By.name("login")).click();
-		
-		WebDriverWait wait = new WebDriverWait(driver,30);
-		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type=\"submit\"]")));
-		
-		List <WebElement> list = new ArrayList<WebElement>();
-		list = driver.findElements(By.tagName("span"));
-		boolean userfound = false;
-		for(WebElement e: list) {
-			if (e.getText().contains("Gamecheck") && !e.getText().contains("Not you") && !e.getText().contains("Log in as")) {
-				userfound = true;
-				break;
-			}
-		}
-		
-		driver.findElement(By.id("userNavigationLabel")).click();
-		
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span//form[@method='post']")));
-		WebElement ele = driver.findElement(By.xpath("//span//form[@method='post']"));
-		JavascriptExecutor executor = (JavascriptExecutor)driver;
-		executor.executeScript("arguments[0].click();", ele);
-		
-		//wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@name='websubmit']")));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@role='button' and contains(text(), 'Create New Account')]")));
+		driver.findElement(By.xpath("//div[@aria-label='Account']")).click();
+		driver.findElement(By.xpath("//span[contains(text(), 'Log Out')]")).click();
+		waitForPageLoading(driver);
 		
 		AssertJUnit.assertTrue(userfound);
 	}
 	
 	@AfterClass
 	public void afterTest() {
+		
+	}
+	
+	public static void waitForPageLoading(WebDriver driver) {
 		
 	}
 	
